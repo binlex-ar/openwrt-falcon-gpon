@@ -1,0 +1,12 @@
+CONFIG_TARGET_lantiq=y
+CONFIG_TARGET_lantiq_falcon=y
+CONFIG_TARGET_lantiq_falcon_DEVICE_lantiq_falcon-sfp=y
+CONFIG_PACKAGE_kmod-gpon-falcon=y
+CONFIG_PACKAGE_luci=y
+CONFIG_PACKAGE_luci-ssl=y
+CONFIG_PACKAGE_kmod-i2c-core=y
+CONFIG_PACKAGE_kmod-i2c-gpio=y
+CONFIG_PACKAGE_kmod-i2c-lantiq=y
+CONFIG_PACKAGE_ethtool=y
+CONFIG_PACKAGE_tcpdump=y
+CONFIG_PACKAGE_ip-full=y
