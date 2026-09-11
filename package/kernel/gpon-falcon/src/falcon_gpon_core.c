@@ -245,10 +245,8 @@ static int falcon_gpon_probe(struct platform_device *pdev)
 
 	falcon_bosa_init(priv->pma_base, priv->dcdc_apd_base, &priv->bosa_calib);
 
-	/* 2. Upload GPE Packet Engine Microcode */
-	ret = falcon_gpe_load_firmware(dev, priv->pctrl_base, priv->pe_base, NULL);
-	if (ret)
-		dev_warn(dev, "falcon_gpon: microcode load failed (%d), continuing with hardware defaults\n", ret);
+	/* 2. Microcode upload deferred to userspace (onu gpei) to avoid bus freeze */
+	dev_info(dev, "falcon_gpon: GPE microcode load deferred to userspace\n");
 
 	/* 3. Initialize GTC Hardware Core */
 	iowrite32be(0x00000003, priv->gtc_base + 0x000); /* GTC reset & enable */
