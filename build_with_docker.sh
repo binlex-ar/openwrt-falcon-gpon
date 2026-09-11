@@ -53,6 +53,8 @@ docker run --rm \
       cp /src/falcon_sfp.diffconfig .config
       make defconfig
 
+      make target/linux/clean || true
+
       echo \"=== Downloading sources ===\"
       make download -j\$(nproc)
 
