@@ -1,6 +1,10 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
- * Open-source BOSA Optical Transceiver Driver for Lantiq Falcon (PEF98036)
+ * falcon_bosa.c - Open-source BOSA Optical Transceiver Driver for Lantiq Falcon
+ *
  * Clean-room reverse-engineered from mod_optic.ko
+ *
+ * Copyright (C) 2026
  */
 
 #include <linux/module.h>
@@ -17,14 +21,10 @@ struct falcon_bosa_dev {
     int pin_tx_disable;
     int pin_tx_fault;
     spinlock_t lock;
-    struct falcon_bosa_tx_cfg cfg;
 };
 
 static struct falcon_bosa_dev g_bosa;
 
-/*
- * Enables / disables laser transmission in burst mode
- */
 int falcon_bosa_tx_enable(int enable)
 {
     u32 val;
@@ -33,41 +33,32 @@ int falcon_bosa_tx_enable(int enable)
     spin_lock_irqsave(&g_bosa.lock, flags);
 
     if (enable) {
-        /* Deassert TX_DISABLE GPIO pin (Active High or Low depending on sfp_pins) */
         if (gpio_is_valid(g_bosa.pin_tx_disable))
             gpio_set_value(g_bosa.pin_tx_disable, 0);
 
-        /* Activate Tx Path Channel 0 in PMA */
-        val = ioread32(g_bosa.pma + PMA_REG_TX_ACTIVATE_CH0);
-        val &= ~0x08; /* Clear disable bit */
-        val |= 0x05;  /* Enable Tx burst clock & data path */
-        iowrite32(val, g_bosa.pma + PMA_REG_TX_ACTIVATE_CH0);
+        val = ioread32be(g_bosa.pma + PMA_REG_TX_ACTIVATE_CH0);
+        val &= ~0x08;
+        val |= 0x05;
+        iowrite32be(val, g_bosa.pma + PMA_REG_TX_ACTIVATE_CH0);
 
-        pr_info("falcon_bosa: Laser burst transmitter ENABLED
-");
+        pr_info("falcon_bosa: Laser burst transmitter ENABLED\n");
     } else {
-        /* Assert TX_DISABLE GPIO pin */
         if (gpio_is_valid(g_bosa.pin_tx_disable))
             gpio_set_value(g_bosa.pin_tx_disable, 1);
 
-        /* Deactivate Tx Path Channel 0 in PMA */
-        val = ioread32(g_bosa.pma + PMA_REG_TX_ACTIVATE_CH0);
-        val |= 0x08;  /* Set disable bit */
+        val = ioread32be(g_bosa.pma + PMA_REG_TX_ACTIVATE_CH0);
+        val |= 0x08;
         val |= 0x05;
-        iowrite32(val, g_bosa.pma + PMA_REG_TX_ACTIVATE_CH0);
+        iowrite32be(val, g_bosa.pma + PMA_REG_TX_ACTIVATE_CH0);
 
-        pr_info("falcon_bosa: Laser transmitter DISABLED
-");
+        pr_info("falcon_bosa: Laser transmitter DISABLED\n");
     }
 
     spin_unlock_irqrestore(&g_bosa.lock, flags);
     return 0;
 }
-EXPORT_SYMBOL(falcon_bosa_tx_enable);
+EXPORT_SYMBOL_GPL(falcon_bosa_tx_enable);
 
-/*
- * Controls Automatic Power Control (APC) Dual-Loop circuits
- */
 int falcon_bosa_set_apc_loop(int bias_loop_closed, int mod_loop_closed)
 {
     u32 val;
@@ -75,63 +66,69 @@ int falcon_bosa_set_apc_loop(int bias_loop_closed, int mod_loop_closed)
 
     spin_lock_irqsave(&g_bosa.lock, flags);
 
-    /* Configure Bias Current APC Loop */
-    val = ioread32(g_bosa.pma + PMA_REG_BIAS_LOOP_CTRL) & ~0x03;
+    val = ioread32be(g_bosa.pma + PMA_REG_BIAS_LOOP_CTRL) & ~0x03;
     if (bias_loop_closed)
-        val |= 0x01; /* Closed loop tracking */
-    iowrite32(val, g_bosa.pma + PMA_REG_BIAS_LOOP_CTRL);
+        val |= 0x01;
+    iowrite32be(val, g_bosa.pma + PMA_REG_BIAS_LOOP_CTRL);
 
-    /* Configure Modulation Current APC Loop */
-    val = ioread32(g_bosa.pma + PMA_REG_MOD_LOOP_CTRL) & ~0x03;
+    val = ioread32be(g_bosa.pma + PMA_REG_MOD_LOOP_CTRL) & ~0x03;
     if (mod_loop_closed)
-        val |= 0x01; /* Closed loop tracking */
-    iowrite32(val, g_bosa.pma + PMA_REG_MOD_LOOP_CTRL);
+        val |= 0x01;
+    iowrite32be(val, g_bosa.pma + PMA_REG_MOD_LOOP_CTRL);
 
     spin_unlock_irqrestore(&g_bosa.lock, flags);
     return 0;
 }
-EXPORT_SYMBOL(falcon_bosa_set_apc_loop);
+EXPORT_SYMBOL_GPL(falcon_bosa_set_apc_loop);
 
-/*
- * Sets APD Avalanche Receiver High Voltage via on-chip step-up DC-DC converter
- */
 int falcon_bosa_set_apd_voltage(u8 voltage_dac)
 {
     unsigned long flags;
 
     spin_lock_irqsave(&g_bosa.lock, flags);
-
-    /* Unlock DC-DC controller */
-    iowrite32(0, g_bosa.dcdc_apd + DCDC_APD_REG_CONTROL);
-
-    /* Write target high-voltage DAC value */
-    iowrite32((u32)voltage_dac, g_bosa.dcdc_apd + DCDC_APD_REG_VOLTAGE_DAC);
-
+    iowrite32be(0, g_bosa.dcdc_apd + DCDC_APD_REG_CONTROL);
+    iowrite32be((u32)voltage_dac, g_bosa.dcdc_apd + DCDC_APD_REG_VOLTAGE_DAC);
     spin_unlock_irqrestore(&g_bosa.lock, flags);
     return 0;
 }
-EXPORT_SYMBOL(falcon_bosa_set_apd_voltage);
+EXPORT_SYMBOL_GPL(falcon_bosa_set_apd_voltage);
 
-/*
- * Writes calibrated Bias and Modulation DAC values
- */
 int falcon_bosa_set_bias_mod_current(u16 bias_dac, u16 mod_dac)
 {
     unsigned long flags;
 
     spin_lock_irqsave(&g_bosa.lock, flags);
-
-    /* Bias current is 11-bit DAC (0..2047) */
-    iowrite32(bias_dac & 0x7FF, g_bosa.pma + PMA_REG_BIAS_DAC);
-
-    /* Modulation current is 11-bit DAC (0..2047) */
-    iowrite32(mod_dac & 0x7FF, g_bosa.pma + PMA_REG_MOD_DAC);
-
+    iowrite32be(bias_dac & 0x7FF, g_bosa.pma + PMA_REG_BIAS_DAC);
+    iowrite32be(mod_dac & 0x7FF, g_bosa.pma + PMA_REG_MOD_DAC);
     spin_unlock_irqrestore(&g_bosa.lock, flags);
     return 0;
 }
-EXPORT_SYMBOL(falcon_bosa_set_bias_mod_current);
+EXPORT_SYMBOL_GPL(falcon_bosa_set_bias_mod_current);
+
+int falcon_bosa_init(void __iomem *pma, void __iomem *dcdc_apd,
+                     const struct bosa_calib_data *calib)
+{
+    g_bosa.pma = pma;
+    g_bosa.dcdc_apd = dcdc_apd;
+    g_bosa.pin_tx_disable = -1;
+    g_bosa.pin_tx_fault = -1;
+    spin_lock_init(&g_bosa.lock);
+
+    if (calib) {
+        falcon_bosa_set_bias_mod_current(calib->bias_dac_val, calib->mod_dac_val);
+        falcon_bosa_set_apc_loop(calib->apc_bias_enable, calib->apc_mod_enable);
+        falcon_bosa_set_apd_voltage(0x96);
+    }
+    return 0;
+}
+EXPORT_SYMBOL_GPL(falcon_bosa_init);
+
+void falcon_bosa_shutdown(void __iomem *pma, void __iomem *dcdc_apd)
+{
+    falcon_bosa_tx_enable(0);
+    falcon_bosa_set_apc_loop(0, 0);
+}
+EXPORT_SYMBOL_GPL(falcon_bosa_shutdown);
 
 MODULE_LICENSE("GPL");
-MODULE_AUTHOR("Clean-room Reverse Engineering Project");
 MODULE_DESCRIPTION("Open-source BOSA Optical Transceiver Driver for Lantiq Falcon");

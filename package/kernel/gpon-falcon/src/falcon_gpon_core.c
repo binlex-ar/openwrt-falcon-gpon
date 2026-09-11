@@ -62,7 +62,7 @@ struct falcon_gpon_priv {
 
 static void falcon_laser_ctrl_cb(bool enable)
 {
-	/* Global callback from PLOAM FSM */
+	falcon_bosa_tx_enable(enable ? 1 : 0);
 	pr_info("falcon_gpon: Laser burst control -> %s\n", enable ? "ARMED" : "OFF");
 }
 
@@ -279,7 +279,7 @@ err_free_netdev:
 	return ret;
 }
 
-static int falcon_gpon_remove(struct platform_device *pdev)
+static void falcon_gpon_remove(struct platform_device *pdev)
 {
 	struct falcon_gpon_priv *priv = platform_get_drvdata(pdev);
 
@@ -289,7 +289,6 @@ static int falcon_gpon_remove(struct platform_device *pdev)
 	free_netdev(priv->netdev);
 
 	pr_info("falcon_gpon: driver removed\n");
-	return 0;
 }
 
 static const struct of_device_id falcon_gpon_match[] = {
