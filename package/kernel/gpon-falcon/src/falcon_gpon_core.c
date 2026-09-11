@@ -59,6 +59,7 @@ struct falcon_gpon_priv {
 	/* Netdev NAPI */
 	struct napi_struct	napi;
 	spinlock_t		tx_lock;
+	bool			gpe_ready;
 };
 
 static void falcon_laser_ctrl_cb(bool enable)
@@ -110,6 +111,7 @@ static int falcon_net_open(struct net_device *netdev)
 	struct falcon_gpon_priv *priv = netdev_priv(netdev);
 
 	napi_enable(&priv->napi);
+	netif_carrier_on(netdev);
 	netif_start_queue(netdev);
 	pr_info("%s: interface opened\n", netdev->name);
 
@@ -121,6 +123,7 @@ static int falcon_net_stop(struct net_device *netdev)
 	struct falcon_gpon_priv *priv = netdev_priv(netdev);
 
 	netif_stop_queue(netdev);
+	netif_carrier_off(netdev);
 	napi_disable(&priv->napi);
 	pr_info("%s: interface stopped\n", netdev->name);
 
@@ -138,18 +141,24 @@ static netdev_tx_t falcon_net_start_xmit(struct sk_buff *skb, struct net_device 
 		return NETDEV_TX_OK;
 	}
 
+	/* If GPE / optical link hardware is not ready, safely drop Tx packet to avoid bus lockup */
+	if (!priv->gpe_ready) {
+		netdev->stats.tx_dropped++;
+		dev_kfree_skb_any(skb);
+		return NETDEV_TX_OK;
+	}
+
 	spin_lock_irqsave(&priv->tx_lock, flags);
 	ret = falcon_net_pdu_write(priv->sram_base, priv->fsqm_base,
 				  priv->link_base, skb->data, skb->len);
-	if (ret < 0) {
-		spin_unlock_irqrestore(&priv->tx_lock, flags);
-		netif_stop_queue(netdev);
-		return NETDEV_TX_BUSY;
-	}
 	spin_unlock_irqrestore(&priv->tx_lock, flags);
 
-	netdev->stats.tx_packets++;
-	netdev->stats.tx_bytes += skb->len;
+	if (ret < 0) {
+		netdev->stats.tx_dropped++;
+	} else {
+		netdev->stats.tx_packets++;
+		netdev->stats.tx_bytes += skb->len;
+	}
 	dev_kfree_skb_any(skb);
 
 	return NETDEV_TX_OK;
@@ -160,6 +169,11 @@ static int falcon_napi_poll(struct napi_struct *napi, int budget)
 	struct falcon_gpon_priv *priv =
 		container_of(napi, struct falcon_gpon_priv, napi);
 	int work_done = 0;
+
+	if (!priv->gpe_ready) {
+		napi_complete_done(napi, 0);
+		return 0;
+	}
 
 	/* Poll Link Engine / GPE RX FIFO */
 	while (work_done < budget) {
@@ -203,6 +217,7 @@ static int falcon_gpon_probe(struct platform_device *pdev)
 	priv->pdev = pdev;
 	priv->netdev = netdev;
 	spin_lock_init(&priv->tx_lock);
+	priv->gpe_ready = false;
 	platform_set_drvdata(pdev, priv);
 
 	/* Map 22 Falcon SoC register peripherals */
