@@ -29,7 +29,7 @@
 
 			partition@c0000 {
 				reg = <0xc0000 0x740000>;
-				label = "firmware";
+				label = "image0";
 				compatible = "openwrt,uimage", "denx,uimage";
 			};
 

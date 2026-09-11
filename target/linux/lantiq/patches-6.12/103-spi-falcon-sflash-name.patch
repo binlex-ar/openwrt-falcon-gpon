@@ -1,0 +1,34 @@
+--- a/drivers/spi/spi-falcon.c
++++ b/drivers/spi/spi-falcon.c
+@@ -10,6 +10,7 @@
+ #include <linux/device.h>
+ #include <linux/platform_device.h>
+ #include <linux/spi/spi.h>
++#include <linux/spi/spi-mem.h>
+ #include <linux/delay.h>
+ #include <linux/of.h>
+ #include <linux/of_platform.h>
+@@ -388,6 +389,15 @@ static int falcon_sflash_xfer_one(struct
+ 	return 0;
+ }
+ 
++static const char *falcon_sflash_get_name(struct spi_mem *mem)
++{
++	return "sflash";
++}
++
++static const struct spi_controller_mem_ops falcon_sflash_mem_ops = {
++	.get_name = falcon_sflash_get_name,
++};
++
+ static int falcon_sflash_probe(struct platform_device *pdev)
+ {
+ 	struct falcon_sflash *priv;
+@@ -401,6 +411,7 @@ static int falcon_sflash_probe(struct pl
+ 	host->flags = SPI_CONTROLLER_HALF_DUPLEX;
+ 	host->setup = falcon_sflash_setup;
+ 	host->transfer_one_message = falcon_sflash_xfer_one;
++	host->mem_ops = &falcon_sflash_mem_ops;
+ 
+ 	return devm_spi_register_controller(&pdev->dev, host);
+ }
