@@ -23,11 +23,17 @@ endef
 define Build/Prepare
 	mkdir -p $(PKG_BUILD_DIR)
 	$(CP) ./src/* $(PKG_BUILD_DIR)/
+	# Ensure timestamps prevent automake from running
+	find $(PKG_BUILD_DIR) -name "aclocal.m4" -exec touch {} +
+	find $(PKG_BUILD_DIR) -name "configure" -exec touch {} +
+	find $(PKG_BUILD_DIR) -name "config.h.in" -exec touch {} +
+	find $(PKG_BUILD_DIR) -name "Makefile.in" -exec touch {} +
 endef
 
 define Build/Compile
 	# 1. Build lib_ifxos
 	( cd $(PKG_BUILD_DIR)/lib_ifxos && \
+	  find . -name "Makefile.in" -exec touch {} + && \
 	  ./configure \
 	    --host=$(GNU_TARGET_NAME) \
 	    --build=$(GNU_HOST_NAME) \
@@ -37,12 +43,14 @@ define Build/Compile
 	    CC="$(TARGET_CC)" \
 	    CFLAGS="$(TARGET_CFLAGS) -fcommon -Wno-error" \
 	    LDFLAGS="$(TARGET_LDFLAGS)" && \
+	  find . -name "Makefile" -exec touch {} + && \
 	  $(MAKE) && \
 	  $(MAKE) install \
 	)
 
 	# 2. Build gpon_omci_api
 	( cd $(PKG_BUILD_DIR)/gpon_omci_api-4.5.0 && \
+	  find . -name "Makefile.in" -exec touch {} + && \
 	  ./configure \
 	    --host=$(GNU_TARGET_NAME) \
 	    --build=$(GNU_HOST_NAME) \
@@ -58,11 +66,13 @@ define Build/Compile
 	    CC="$(TARGET_CC)" \
 	    CFLAGS="$(TARGET_CFLAGS) -fcommon -Wno-error" \
 	    LDFLAGS="$(TARGET_LDFLAGS) -L$(PKG_BUILD_DIR)/install_ifxos/lib" && \
+	  find . -name "Makefile" -exec touch {} + && \
 	  $(MAKE) \
 	)
 
 	# 3. Build gpon_omci_onu (omcid binary)
 	( cd $(PKG_BUILD_DIR)/gpon_omci_onu-4.5.0 && \
+	  find . -name "Makefile.in" -exec touch {} + && \
 	  CPPFLAGS="-I$(PKG_BUILD_DIR)/include/onu" \
 	  ./configure \
 	    --host=$(GNU_TARGET_NAME) \
@@ -83,6 +93,7 @@ define Build/Compile
 	    CC="$(TARGET_CC)" \
 	    CFLAGS="$(TARGET_CFLAGS) -fcommon -Wno-error" \
 	    LDFLAGS="$(TARGET_LDFLAGS) -L$(PKG_BUILD_DIR)/install_ifxos/lib -L$(PKG_BUILD_DIR)/gpon_omci_api-4.5.0/src" && \
+	  find . -name "Makefile" -exec touch {} + && \
 	  $(MAKE) \
 	)
 endef

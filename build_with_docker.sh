@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# build_with_docker.sh - Automated local build using Ubuntu Docker container
+# build_with_docker.sh - Automated local build using Ubuntu Docker container on Mac
 #
 set -e
 
@@ -9,34 +9,61 @@ WORK_DIR="${SCRIPT_DIR}/build_out"
 
 mkdir -p "${WORK_DIR}"
 
-echo "=== Starting OpenWrt 25 build for Lantiq Falcon SFP ==="
+echo "=== Starting OpenWrt 25 build for Lantiq Falcon SFP with Docker ==="
+echo "Source: ${SCRIPT_DIR}"
+echo "Output: ${WORK_DIR}"
 
-docker run --rm -it \
-  -v "${SCRIPT_DIR}:/src" \
-  -v "${WORK_DIR}:/workspace" \
+# Use named volume 'openwrt_falcon_build' for fast, native case-sensitive ext4 filesystem in Docker
+docker run --rm \
+  -v "${SCRIPT_DIR}:/src:ro" \
+  -v "${WORK_DIR}:/output" \
+  -v openwrt_falcon_build:/workspace \
   -w /workspace \
-  ubuntu:24.04 bash -c '
+  ubuntu:24.04 bash -c "
     set -e
+    export DEBIAN_FRONTEND=noninteractive
     apt-get update && apt-get install -y \
-      build-essential clang flex bison g++ gawk gcc-multilib g++-multilib \
-      gettext git libncurses5-dev libssl-dev python3 rsync unzip zlib1g-dev \
-      file wget qemu-utils sudo
+      build-essential clang flex bison g++ gawk \
+      gettext git libncurses5-dev libssl-dev python3 python3-setuptools python3-pip \
+      rsync unzip zlib1g-dev file wget qemu-utils sudo device-tree-compiler automake autoconf libtool
 
-    useradd -m builduser && chown -R builduser:builduser /workspace /src
-    su - builduser -c "
+    id -u builduser &>/dev/null || useradd -m -s /bin/bash builduser
+    chown -R builduser:builduser /workspace
+
+    su - builduser -c '
       set -e
-      if [ ! -d openwrt ]; then
-        git clone --depth 1 https://github.com/openwrt/openwrt.git openwrt
+      if [ ! -d /workspace/openwrt ]; then
+        echo \"=== Cloning OpenWrt repository ===\"
+        git clone --depth 1 https://github.com/openwrt/openwrt.git /workspace/openwrt
       fi
-      cd openwrt
-      cp -r /src/package/kernel/gpon-falcon package/kernel/
+      cd /workspace/openwrt
+
+      echo \"=== Injecting GPON drivers, services, and DTS patches ===\"
+      mkdir -p package/kernel package/network/services
+      cp -rf /src/package/kernel/gpon-falcon package/kernel/
+      cp -rf /src/package/network/services/* package/network/services/
+      if [ -d /src/target ]; then
+        cp -rf /src/target/* target/
+      fi
+
       ./scripts/feeds update -a
       ./scripts/feeds install -a
+
+      echo \"=== Configuring OpenWrt target ===\"
       cp /src/falcon_sfp.diffconfig .config
       make defconfig
-      make download -j\$(nproc)
-      make -j\$(nproc)
-    "
-  '
 
-echo "=== Build finished! Firmware is located in ${WORK_DIR}/openwrt/bin/targets/lantiq/falcon/ ==="
+      echo \"=== Downloading sources ===\"
+      make download -j\$(nproc)
+
+      echo \"=== Compiling toolchain, kernel and images (using \$(nproc) cores) ===\"
+      make -j\$(nproc) || make -j1 V=s
+    '
+
+    echo \"=== Copying built firmware to host output directory ===\"
+    mkdir -p /output
+    cp -rf /workspace/openwrt/bin/targets/lantiq/falcon/* /output/
+    chmod -R 777 /output
+  "
+
+echo "=== Local build finished! Firmware is located in ${WORK_DIR} ==="
