@@ -132,6 +132,9 @@ static void ploam_state_transition(struct falcon_ploam_ctx *ctx,
 
 	ctx->state = new_state;
 
+	if (ctx->state_change_cb)
+		ctx->state_change_cb(new_state, old_state);
+
 	switch (new_state) {
 	case PLOAM_STATE_O1_INITIAL_RUN:
 	case PLOAM_STATE_O2_STANDBY:

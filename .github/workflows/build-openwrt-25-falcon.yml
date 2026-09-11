@@ -29,9 +29,11 @@ jobs:
         run: |
           git clone --depth 1 https://github.com/openwrt/openwrt.git openwrt
 
-      - name: Inject GPON Falcon driver and firmware
+      - name: Inject GPON Falcon driver, OMCI daemon and firmware
         run: |
+          mkdir -p openwrt/package/kernel openwrt/package/network/services
           cp -r package/kernel/gpon-falcon openwrt/package/kernel/
+          cp -r package/network/services/omcid openwrt/package/network/services/
           cd openwrt
           ./scripts/feeds update -a
           ./scripts/feeds install -a
@@ -50,7 +52,7 @@ jobs:
       - name: Compile OpenWrt Toolchain, Kernel and Images
         run: |
           cd openwrt
-          make -j$(nproc) || (make package/kernel/gpon-falcon/compile V=sc && make -j$(nproc))
+          make -j$(nproc) || make -j1 V=sc
 
       - name: Archive firmware artifacts
         uses: actions/upload-artifact@v4
@@ -59,4 +61,6 @@ jobs:
           path: |
             openwrt/bin/targets/lantiq/falcon/*sysupgrade.bin
             openwrt/bin/targets/lantiq/falcon/*image*
-            openwrt/bin/targets/lantiq/falcon/packages/kmod-gpon-falcon*
+            openwrt/bin/targets/lantiq/falcon/packages/*gpon*
+            openwrt/bin/packages/mips_24kc/*/omcid*
+

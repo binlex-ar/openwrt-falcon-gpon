@@ -22,6 +22,7 @@
 #include "falcon_gpe.h"
 #include "falcon_bosa.h"
 #include "falcon_ploam.h"
+#include "falcon_onu_dev.h"
 
 #define DRV_NAME "falcon-gpon"
 #define DRV_VERSION "1.0.0"
@@ -253,9 +254,13 @@ static int falcon_gpon_probe(struct platform_device *pdev)
 	/* 4. Setup PLOAM Protocol Engine */
 	priv->ploam.laser_set_enable = falcon_laser_ctrl_cb;
 	priv->ploam.carrier_set = falcon_carrier_ctrl_cb;
+	priv->ploam.state_change_cb = falcon_onu_notify_ploam_state;
 	falcon_ploam_init(&priv->ploam, priv->gtc_base, (u8 *)onu_sn, (u8 *)onu_pwd);
 
-	/* 4. Configure net_device */
+	/* 5. Initialize /dev/onu0 and /dev/optic0 Character Devices */
+	falcon_onu_dev_init(priv);
+
+	/* 6. Configure net_device */
 	ether_setup(netdev);
 	netdev->netdev_ops = &falcon_netdev_ops;
 	eth_hw_addr_random(netdev);
@@ -264,7 +269,7 @@ static int falcon_gpon_probe(struct platform_device *pdev)
 	ret = register_netdev(netdev);
 	if (ret) {
 		pr_err("falcon_gpon: failed to register netdev\n");
-		goto err_ploam_destroy;
+		goto err_onu_dev;
 	}
 
 	pr_info("falcon_gpon: interface %s registered successfully (MAC: %pM)\n",
@@ -272,6 +277,8 @@ static int falcon_gpon_probe(struct platform_device *pdev)
 
 	return 0;
 
+err_onu_dev:
+	falcon_onu_dev_exit(priv);
 err_ploam_destroy:
 	falcon_ploam_destroy(&priv->ploam);
 err_free_netdev:
@@ -284,6 +291,7 @@ static void falcon_gpon_remove(struct platform_device *pdev)
 	struct falcon_gpon_priv *priv = platform_get_drvdata(pdev);
 
 	unregister_netdev(priv->netdev);
+	falcon_onu_dev_exit(priv);
 	falcon_ploam_destroy(&priv->ploam);
 	falcon_bosa_shutdown(priv->pma_base, priv->dcdc_apd_base);
 	free_netdev(priv->netdev);

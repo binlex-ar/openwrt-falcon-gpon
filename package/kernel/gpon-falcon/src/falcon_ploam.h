@@ -91,6 +91,7 @@ struct falcon_ploam_ctx {
 	/* Callbacks into BOSA optics & netdev */
 	void (*laser_set_enable)(bool enable);
 	void (*carrier_set)(bool link_up);
+	void (*state_change_cb)(enum gpon_ploam_state new_state, enum gpon_ploam_state old_state);
 };
 
 /* Public API */
