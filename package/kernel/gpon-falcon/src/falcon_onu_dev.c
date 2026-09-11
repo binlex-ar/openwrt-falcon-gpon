@@ -85,8 +85,8 @@ void falcon_onu_notify_ploam_state(enum gpon_ploam_state new_state,
 	st.previous_state = (uint32_t)old_state;
 	st.elapsed_msec = 0;
 
-	pr_info("falcon_onu0: notifying omcid PLOAM state %d -> %d\n",
-		old_state, new_state);
+	pr_debug("falcon_onu0: notifying omcid PLOAM state %d -> %d\n",
+		 old_state, new_state);
 
 	falcon_onu_push_event(ONU_EVENT_STATE_CHANGE, &st, sizeof(st));
 }
@@ -111,9 +111,6 @@ void falcon_onu_notify_omci_rx(const u8 *data, size_t len)
  */
 static int falcon_onu_open(struct inode *inode, struct file *file)
 {
-	/* If link is already in Operation (O5), immediately notify state */
-	falcon_onu_notify_ploam_state(PLOAM_STATE_O5_OPERATION,
-				      PLOAM_STATE_O4_RANGING);
 	return 0;
 }
 
