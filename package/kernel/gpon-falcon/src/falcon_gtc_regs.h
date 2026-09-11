@@ -1,9 +1,10 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 #ifndef __FALCON_GTC_REGS_H__
 #define __FALCON_GTC_REGS_H__
 
 #include <linux/types.h>
 
-#define FALCON_GTC_BASE_PHYS      0x1E100000
+#define FALCON_GTC_BASE_PHYS      0x1DC00000
 #define FALCON_GTC_MEM_SIZE       0x1000
 
 /* Register Offsets */
@@ -43,25 +44,5 @@
 #define GTC_TX_CTRL_REQ_ONLY      (1 << 1)
 
 #define GTC_US_STAT_TX_BUSY       (1 << 0)
-
-/* PLOAM Message Buffer Representation */
-struct gtc_ploam_msg {
-    u8  onu_id;
-    u8  msg_id;
-    u8  data[10];
-    u8  crc;
-} __packed;
-
-/* PLOAM Protocol State Machine States (ITU-T G.984.3) */
-enum ploam_state {
-    PLOAM_STATE_UNKNOWN = 0,
-    PLOAM_STATE_O1_INITIAL,
-    PLOAM_STATE_O2_STANDBY,
-    PLOAM_STATE_O3_SERIAL_NUMBER,
-    PLOAM_STATE_O4_RANGING,
-    PLOAM_STATE_O5_OPERATION,
-    PLOAM_STATE_O6_POPUP,
-    PLOAM_STATE_O7_EMERGENCY_STOP,
-};
 
 #endif /* __FALCON_GTC_REGS_H__ */
