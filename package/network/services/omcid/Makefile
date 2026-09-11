@@ -41,7 +41,7 @@ define Build/Compile
 	    --without-kernel-module \
 	    --enable-linux-26 \
 	    CC="$(TARGET_CC)" \
-	    CFLAGS="$(TARGET_CFLAGS) -fcommon -Wno-error" \
+	    CFLAGS="$(TARGET_CFLAGS) -mno-mips16 -fcommon -fpermissive -Wno-error=implicit-function-declaration -Wno-implicit-function-declaration -Wno-error=incompatible-pointer-types -Wno-error=int-conversion -Wno-error" \
 	    LDFLAGS="$(TARGET_LDFLAGS)" && \
 	  find . -name "Makefile" -exec touch {} + && \
 	  $(MAKE) && \
@@ -64,7 +64,7 @@ define Build/Compile
 	    --disable-remote-onu \
 	    --enable-debug-prints \
 	    CC="$(TARGET_CC)" \
-	    CFLAGS="$(TARGET_CFLAGS) -fcommon -Wno-error" \
+	    CFLAGS="$(TARGET_CFLAGS) -mno-mips16 -fcommon -fpermissive -Wno-error=implicit-function-declaration -Wno-implicit-function-declaration -Wno-error=incompatible-pointer-types -Wno-error=int-conversion -Wno-error" \
 	    LDFLAGS="$(TARGET_LDFLAGS) -L$(PKG_BUILD_DIR)/install_ifxos/lib" && \
 	  find . -name "Makefile" -exec touch {} + && \
 	  $(MAKE) \
@@ -86,12 +86,12 @@ define Build/Compile
 	    --disable-voip \
 	    --enable-pm \
 	    --disable-remote-onu \
-	    --enable-omci-uci \
+	    --disable-omci-uci \
 	    --disable-libucimap \
 	    --enable-formatted-omci-dump \
 	    --enable-debug-prints \
 	    CC="$(TARGET_CC)" \
-	    CFLAGS="$(TARGET_CFLAGS) -fcommon -Wno-error" \
+	    CFLAGS="$(TARGET_CFLAGS) -mno-mips16 -fcommon -fpermissive -Wno-error=implicit-function-declaration -Wno-implicit-function-declaration -Wno-error=incompatible-pointer-types -Wno-error=int-conversion -Wno-error" \
 	    LDFLAGS="$(TARGET_LDFLAGS) -L$(PKG_BUILD_DIR)/install_ifxos/lib -L$(PKG_BUILD_DIR)/gpon_omci_api-4.5.0/src" && \
 	  find . -name "Makefile" -exec touch {} + && \
 	  $(MAKE) \

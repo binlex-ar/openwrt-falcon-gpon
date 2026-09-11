@@ -24,6 +24,9 @@
 #endif
 
 #include <stdio.h>
+#include <sys/ioctl.h>
+#include <linux/ioctl.h>
+#include "ifxos_print_io.h"
 #include "drv_onu_lan_interface.h"
 
 #define GOI_NAME "optic"
