@@ -7,20 +7,20 @@ Get:3 http://ports.ubuntu.com/ubuntu-ports noble-backports InRelease [126 kB]
 Get:4 http://ports.ubuntu.com/ubuntu-ports noble-security InRelease [126 kB]
 Get:5 http://ports.ubuntu.com/ubuntu-ports noble/multiverse arm64 Packages [274 kB]
 Get:6 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 Packages [19.0 MB]
-Get:7 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 Packages [1776 kB]
-Get:8 http://ports.ubuntu.com/ubuntu-ports noble/restricted arm64 Packages [113 kB]
+Get:7 http://ports.ubuntu.com/ubuntu-ports noble/restricted arm64 Packages [113 kB]
+Get:8 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 Packages [1776 kB]
 Get:9 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 Packages [1627 kB]
-Get:10 http://ports.ubuntu.com/ubuntu-ports noble-updates/multiverse arm64 Packages [92.2 kB]
-Get:11 http://ports.ubuntu.com/ubuntu-ports noble-updates/restricted arm64 Packages [2831 kB]
-Get:12 http://ports.ubuntu.com/ubuntu-ports noble-updates/universe arm64 Packages [2195 kB]
-Get:13 http://ports.ubuntu.com/ubuntu-ports noble-backports/multiverse arm64 Packages [671 B]
-Get:14 http://ports.ubuntu.com/ubuntu-ports noble-backports/universe arm64 Packages [36.3 kB]
-Get:15 http://ports.ubuntu.com/ubuntu-ports noble-backports/main arm64 Packages [48.9 kB]
-Get:16 http://ports.ubuntu.com/ubuntu-ports noble-security/universe arm64 Packages [1616 kB]
-Get:17 http://ports.ubuntu.com/ubuntu-ports noble-security/restricted arm64 Packages [2707 kB]
+Get:10 http://ports.ubuntu.com/ubuntu-ports noble-updates/restricted arm64 Packages [2831 kB]
+Get:11 http://ports.ubuntu.com/ubuntu-ports noble-updates/universe arm64 Packages [2195 kB]
+Get:12 http://ports.ubuntu.com/ubuntu-ports noble-updates/multiverse arm64 Packages [92.2 kB]
+Get:13 http://ports.ubuntu.com/ubuntu-ports noble-backports/main arm64 Packages [48.9 kB]
+Get:14 http://ports.ubuntu.com/ubuntu-ports noble-backports/multiverse arm64 Packages [671 B]
+Get:15 http://ports.ubuntu.com/ubuntu-ports noble-backports/universe arm64 Packages [36.3 kB]
+Get:16 http://ports.ubuntu.com/ubuntu-ports noble-security/restricted arm64 Packages [2707 kB]
+Get:17 http://ports.ubuntu.com/ubuntu-ports noble-security/multiverse arm64 Packages [87.7 kB]
 Get:18 http://ports.ubuntu.com/ubuntu-ports noble-security/main arm64 Packages [1312 kB]
-Get:19 http://ports.ubuntu.com/ubuntu-ports noble-security/multiverse arm64 Packages [87.7 kB]
-Fetched 34.4 MB in 2s (17.3 MB/s)
+Get:19 http://ports.ubuntu.com/ubuntu-ports noble-security/universe arm64 Packages [1616 kB]
+Fetched 34.4 MB in 2s (19.1 MB/s)
 Reading package lists...
 Reading package lists...
 Building dependency tree...
@@ -398,7 +398,7 @@ Get:254 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 unzip arm6
 Get:255 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libfdt1 arm64 1.7.0-2build1 [21.1 kB]
 Get:256 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 device-tree-compiler arm64 1.7.0-2build1 [227 kB]
 debconf: delaying package configuration, since apt-utils is not installed
-Fetched 292 MB in 5s (61.6 MB/s)
+Fetched 292 MB in 5s (61.4 MB/s)
 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 4376 files and directories currently installed.)
 Preparing to unpack .../libc6_2.39-0ubuntu8.9_arm64.deb ...
 Unpacking libc6:arm64 (2.39-0ubuntu8.9) over (2.39-0ubuntu8.8) ...
@@ -1241,8 +1241,8 @@ Setting up libsasl2-modules-db:arm64 (2.1.28+dfsg1-5ubuntu3.1) ...
 Setting up tzdata (2026c-0ubuntu0.24.04.1) ...
 
 Current default time zone: 'Etc/UTC'
-Local time is now:      Fri Sep 11 11:40:27 UTC 2026.
-Universal Time is now:  Fri Sep 11 11:40:27 UTC 2026.
+Local time is now:      Fri Sep 11 11:56:38 UTC 2026.
+Universal Time is now:  Fri Sep 11 11:56:38 UTC 2026.
 Run 'dpkg-reconfigure tzdata' if you wish to change it.
 
 Setting up fakeroot (1.33-1) ...
@@ -1552,7 +1552,7 @@ WARNING: Makefile 'package/feeds/packages/prometheus-node-exporter-lua/Makefile'
 make[2]: Entering directory '/workspace/openwrt/scripts/config'
 make[2]: 'conf' is up to date.
 make[2]: Leaving directory '/workspace/openwrt/scripts/config'
-time: target/linux/prereq#0.06#0.02#0.09
+time: target/linux/prereq#0.07#0.04#0.11
  make[1] target/linux/clean
  make[2] -C target/linux clean
 === Downloading sources ===
@@ -1568,82 +1568,82 @@ WARNING: Makefile 'package/feeds/luci/luci-app-dcwapd/Makefile' has a dependency
 WARNING: Makefile 'package/feeds/packages/prometheus-node-exporter-lua/Makefile' has a dependency on 'bmx7', which does not exist
 WARNING: Makefile 'package/feeds/packages/prometheus-node-exporter-lua/Makefile' has a dependency on 'bmx7-json', which does not exist
  make[1] tools/download
- make[2] -C tools/automake download
  make[2] -C tools/autoconf download
+ make[2] -C tools/autoconf-archive download
  make[2] -C tools/bc download
+ make[2] -C tools/bison download
+ make[2] -C tools/automake download
  make[2] -C tools/cmake download
  make[2] -C tools/cpio download
- make[2] -C tools/autoconf-archive download
- make[2] -C tools/bison download
  make[2] -C tools/dosfstools download
  make[2] -C tools/e2fsprogs download
- make[2] -C tools/elfutils download
  make[2] -C tools/erofs-utils download
- make[2] -C tools/expat download
- make[2] -C tools/fakeroot download
+ make[2] -C tools/elfutils download
  make[2] -C tools/findutils download
+ make[2] -C tools/fakeroot download
+ make[2] -C tools/expat download
  make[2] -C tools/firmware-utils download
  make[2] -C tools/flex download
  make[2] -C tools/gengetopt download
+ make[2] -C tools/gnulib download
  make[2] -C tools/libtool download
  make[2] -C tools/libressl download
- make[2] -C tools/m4 download
- make[2] -C tools/gnulib download
  make[2] -C tools/lzma download
+ make[2] -C tools/m4 download
  make[2] -C tools/make-ext4fs download
  make[2] -C tools/meson download
  make[2] -C tools/missing-macros download
- make[2] -C tools/mtd-utils download
  make[2] -C tools/mkimage download
+ make[2] -C tools/mtd-utils download
  make[2] -C tools/mklibs download
- make[2] -C tools/ninja download
  make[2] -C tools/mtools download
+ make[2] -C tools/ninja download
  make[2] -C tools/padjffs2 download
  make[2] -C tools/patch-image download
  make[2] -C tools/patchelf download
  make[2] -C tools/pkgconf download
  make[2] -C tools/quilt download
- make[2] -C tools/squashfs4 download
  make[2] -C tools/sstrip download
  make[2] -C tools/util-linux download
+ make[2] -C tools/squashfs4 download
  make[2] -C tools/xz download
  make[2] -C tools/zip download
  make[2] -C tools/zlib download
  make[2] -C tools/gmp download
  make[2] -C tools/mpc download
- make[2] -C tools/libdeflate download
  make[2] -C tools/mpfr download
- make[2] -C tools/tar download
+ make[2] -C tools/libdeflate download
  make[2] -C tools/patch download
+ make[2] -C tools/tar download
  make[2] -C tools/zstd download
- make[2] -C tools/sed download
  make[2] -C tools/flock download
+ make[2] -C tools/sed download
  make[1] toolchain/download
- make[2] -C toolchain/gdb download
  make[2] -C toolchain/kernel-headers download
+ make[2] -C toolchain/gdb download
  make[2] -C toolchain/gcc/initial download
- make[2] -C toolchain/binutils download
  make[2] -C toolchain/gcc/final download
- make[2] -C toolchain/musl download
+ make[2] -C toolchain/binutils download
  make[2] -C toolchain/fortify-headers download
+ make[2] -C toolchain/musl download
  make[1] package/download
  make[2] -C feeds/luci/collections/luci download
  make[2] -C feeds/luci/applications/luci-app-firewall download
- make[2] -C feeds/luci/applications/luci-app-package-manager download
  make[2] -C package/base-files download
- make[2] -C feeds/luci/modules/luci-compat download
  make[2] -C feeds/luci/modules/luci-base download
- make[2] -C feeds/luci/libs/luci-lib-ip download
+ make[2] -C feeds/luci/modules/luci-compat download
+ make[2] -C feeds/luci/applications/luci-app-package-manager download
  make[2] -C feeds/luci/libs/luci-lib-base download
+ make[2] -C feeds/luci/libs/luci-lib-ip download
  make[2] -C feeds/luci/libs/luci-lib-jsonc download
- make[2] -C feeds/luci/libs/luci-lib-nixio download
  make[2] -C feeds/luci/libs/luci-lib-uqr download
+ make[2] -C feeds/luci/libs/luci-lib-nixio download
  make[2] -C feeds/luci/collections/luci-light download
  make[2] -C feeds/luci/modules/luci-lua-runtime download
  make[2] -C feeds/luci/modules/luci-mod-admin-full download
  make[2] -C feeds/luci/modules/luci-mod-network download
- make[2] -C feeds/luci/modules/luci-mod-status download
  make[2] -C feeds/luci/modules/luci-mod-system download
+ make[2] -C feeds/luci/modules/luci-mod-status download
  make[2] -C feeds/luci/protocols/luci-proto-ipv6 download
  make[2] -C feeds/luci/protocols/luci-proto-ppp download
  make[2] -C feeds/luci/collections/luci-ssl download
@@ -1681,14 +1681,14 @@ WARNING: Makefile 'package/feeds/packages/prometheus-node-exporter-lua/Makefile'
  make[2] -C package/network/services/odhcpd download
  make[2] -C package/network/services/omcid download
  make[2] -C package/network/services/ppp download
- make[2] -C package/network/utils/ethtool download
  make[2] -C package/network/services/uhttpd download
+ make[2] -C package/network/utils/ethtool download
  make[2] -C package/network/utils/iproute2 download
  make[2] -C package/network/utils/iwinfo download
  make[2] -C package/network/utils/nftables download
  make[2] -C package/network/utils/tcpdump download
- make[2] -C package/system/apk download
  make[2] -C package/system/ca-certificates download
+ make[2] -C package/system/apk download
  make[2] -C package/system/fstools download
  make[2] -C package/system/fwtool download
  make[2] -C package/system/mtd download
@@ -1746,29 +1746,29 @@ make[2]: Leaving directory '/workspace/openwrt/scripts/config'
  make[3] -C target/linux compile
  make[2] buildinfo
  make[2] package/compile
+ make[3] diffconfig buildversion feedsversion
+ make[3] -C package/system/fwtool host-compile
  make[3] -C package/utils/lua host-compile
  make[3] -C package/libs/ncurses host-compile
- make[3] -C package/system/usign host-compile
- make[3] -C package/system/fwtool host-compile
- make[3] -C feeds/luci/modules/luci-base host-compile
  make[3] -C package/libs/libjson-c host-compile
+ make[3] -C package/system/usign host-compile
+ make[3] -C feeds/luci/modules/luci-base host-compile
  make[3] -C feeds/luci/contrib/package/csstidy host-compile
- make[3] diffconfig buildversion feedsversion
- make[3] -C package/system/apk host-compile
  make[3] -C package/libs/libubox host-compile
  make[3] -C package/utils/ucode host-compile
+ make[3] -C package/system/apk host-compile
  make[3] -C package/system/ucert host-compile
  make[3] -C package/libs/toolchain compile
- make[3] -C package/kernel/gpon-falcon compile
  make[3] -C package/kernel/gpio-button-hotplug compile
- make[3] -C package/libs/libjson-c compile
+ make[3] -C package/kernel/gpon-falcon compile
  make[3] -C package/libs/libnl-tiny compile
- make[3] -C package/utils/lua compile
  make[3] -C package/libs/libmd compile
+ make[3] -C package/libs/libjson-c compile
+ make[3] -C package/utils/lua compile
  make[3] -C package/libs/zlib compile
  make[3] -C package/firmware/linux-firmware compile
- make[3] -C package/libs/libsepol compile
  make[3] -C package/system/fwtool compile
+ make[3] -C package/libs/libsepol compile
  make[3] -C package/libs/musl-fts compile
  make[3] -C package/system/openwrt-keyring compile
  make[3] -C package/libs/jansson compile
@@ -1790,9 +1790,11 @@ make[2]: Leaving directory '/workspace/openwrt/scripts/config'
  make[3] -C package/libs/openssl compile
  make[3] -C package/system/ca-certificates compile
  make[3] -C package/libs/libubox compile
+ make[3] -C package/kernel/linux compile
  make[3] -C package/libs/ncurses compile
  make[3] -C package/libs/pcre2 compile
  make[3] -C package/libs/libnftnl compile
+ make[3] -C package/libs/ustream-ssl compile
  make[3] -C package/utils/px5g-mbedtls compile
  make[3] -C package/libs/elfutils compile
  make[3] -C package/network/utils/tcpdump compile
@@ -1800,7 +1802,6 @@ make[2]: Leaving directory '/workspace/openwrt/scripts/config'
  make[3] -C package/system/urngd compile
  make[3] -C package/system/ubus compile
  make[3] -C package/system/uci compile
- make[3] -C package/kernel/linux compile
  make[3] -C package/utils/util-linux compile
  make[3] -C package/utils/jsonfilter compile
  make[3] -C package/libs/libselinux compile
@@ -1808,7 +1809,6 @@ make[2]: Leaving directory '/workspace/openwrt/scripts/config'
  make[3] -C package/network/utils/iwinfo compile
  make[3] -C feeds/packages/net/cgi-io compile
  make[4] scripts/config/conf
- make[3] -C package/libs/ustream-ssl compile
  make[3] -C package/libs/libbpf compile
  make[3] -C package/network/ipv6/odhcp6c compile
  make[3] -C package/network/services/dnsmasq compile
@@ -1817,32 +1817,32 @@ make[2]: Leaving directory '/workspace/openwrt/scripts/config'
  make[3] -C package/utils/ucode compile
  make[3] -C package/utils/mtd-utils compile
  make[3] -C package/utils/busybox compile
- make[3] -C feeds/luci/contrib/package/lucihttp compile
  make[3] -C package/system/rpcd compile
+ make[3] -C feeds/luci/contrib/package/lucihttp compile
  make[3] -C package/libs/udebug compile
  make[3] -C feeds/luci/contrib/package/ucode-mod-html compile
- make[3] -C package/network/services/uhttpd compile
  make[3] -C feeds/luci/contrib/package/ucode-mod-lua compile
+ make[3] -C package/network/services/uhttpd compile
  make[3] -C package/libs/uclient compile
  make[3] -C package/network/config/netifd compile
  make[3] -C package/system/ubox compile
- make[3] -C feeds/luci/libs/rpcd-mod-rrdns compile
  make[3] -C feeds/luci/libs/rpcd-mod-luci compile
+ make[3] -C feeds/luci/libs/rpcd-mod-rrdns compile
  make[3] -C feeds/luci/libs/luci-lib-base compile
  make[3] -C package/system/apk compile
  make[3] -C feeds/luci/modules/luci-base compile
  make[3] -C package/system/urandom-seed compile
  make[3] -C feeds/luci/applications/luci-app-package-manager compile
  make[3] -C feeds/luci/modules/luci-mod-system compile
- make[3] -C feeds/luci/modules/luci-mod-status compile
  make[3] -C feeds/luci/modules/luci-mod-network compile
+ make[3] -C feeds/luci/modules/luci-mod-status compile
  make[3] -C feeds/luci/themes/luci-theme-bootstrap compile
  make[3] -C feeds/luci/modules/luci-lua-runtime compile
  make[3] -C feeds/luci/modules/luci-mod-admin-full compile
  make[3] -C feeds/luci/modules/luci-compat compile
  make[3] -C package/network/services/luci-app-gpon compile
- make[3] -C package/network/utils/nftables compile
  make[3] -C package/system/fstools compile
+ make[3] -C package/network/utils/nftables compile
  make[3] -C package/network/utils/iptables compile
  make[3] -C package/system/procd compile
  make[3] -C package/network/config/firewall4 compile

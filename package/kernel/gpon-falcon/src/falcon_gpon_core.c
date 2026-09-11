@@ -223,7 +223,7 @@ static int falcon_gpon_probe(struct platform_device *pdev)
 	}
 
 	/* Get interrupts */
-	priv->gtc_irq = platform_get_irq(pdev, 0);
+	priv->gtc_irq = platform_get_irq_optional(pdev, 0);
 	if (priv->gtc_irq < 0)
 		priv->gtc_irq = 40; /* Default Falcon GTC IRQ */
 
@@ -315,7 +315,37 @@ static struct platform_driver falcon_gpon_driver = {
 	},
 };
 
-module_platform_driver(falcon_gpon_driver);
+static struct platform_device *falcon_gpon_pdev;
+
+static int __init falcon_gpon_init(void)
+{
+	int ret;
+
+	ret = platform_driver_register(&falcon_gpon_driver);
+	if (ret)
+		return ret;
+
+	if (!of_find_compatible_node(NULL, NULL, "lantiq,falcon-gpon")) {
+		pr_info("falcon_gpon: auto-registering platform device\n");
+		falcon_gpon_pdev = platform_device_register_simple(DRV_NAME, -1, NULL, 0);
+		if (IS_ERR(falcon_gpon_pdev)) {
+			platform_driver_unregister(&falcon_gpon_driver);
+			return PTR_ERR(falcon_gpon_pdev);
+		}
+	}
+
+	return 0;
+}
+
+static void __exit falcon_gpon_exit(void)
+{
+	if (falcon_gpon_pdev)
+		platform_device_unregister(falcon_gpon_pdev);
+	platform_driver_unregister(&falcon_gpon_driver);
+}
+
+module_init(falcon_gpon_init);
+module_exit(falcon_gpon_exit);
 
 MODULE_AUTHOR("OpenWrt / Lantiq Falcon Open Source Community");
 MODULE_DESCRIPTION("Open-Source GPON MAC/PHY Driver for Lantiq Falcon (PEF98036)");

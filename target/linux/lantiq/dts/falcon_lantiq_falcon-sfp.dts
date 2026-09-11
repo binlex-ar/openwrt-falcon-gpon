@@ -66,6 +66,10 @@
 		pinctrl-2 = <&asc0_func2>;
 		pinctrl-3 = <&asc0_func3>;
 	};
+
+	gpon {
+		compatible = "lantiq,falcon-gpon";
+	};
 };
 
 &serial0 {
