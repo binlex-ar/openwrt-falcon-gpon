@@ -20,7 +20,9 @@
 
 #if defined(__LINUX__) && !defined(__KERNEL__)
 /* include __WORDSIZE */
-#  include <bits/wordsize.h>
+#  if defined(__GLIBC__)
+#    include <bits/wordsize.h>
+#  endif
 #endif
 
 #if defined(__KERNEL__)
