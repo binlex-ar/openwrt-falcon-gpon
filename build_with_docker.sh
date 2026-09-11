@@ -59,6 +59,7 @@ docker run --rm \
       make download -j\$(nproc)
 
       make package/network/services/omcid/clean || true
+      make package/kernel/gpon-falcon/clean || true
 
       echo \"=== Compiling toolchain, kernel and images (using \$(nproc) cores) ===\"
       make -j\$(nproc) || make -j1 V=s

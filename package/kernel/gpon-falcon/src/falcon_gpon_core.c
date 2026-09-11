@@ -224,14 +224,16 @@ static int falcon_gpon_probe(struct platform_device *pdev)
 
 	/* Get interrupts */
 	priv->gtc_irq = platform_get_irq_optional(pdev, 0);
-	if (priv->gtc_irq < 0)
-		priv->gtc_irq = 40; /* Default Falcon GTC IRQ */
-
-	ret = devm_request_irq(dev, priv->gtc_irq, falcon_gtc_isr,
-			       0, "falcon_gtc", priv);
-	if (ret) {
-		pr_err("falcon_gpon: unable to request GTC IRQ %d\n", priv->gtc_irq);
-		goto err_free_netdev;
+	if (priv->gtc_irq > 0) {
+		ret = devm_request_irq(dev, priv->gtc_irq, falcon_gtc_isr,
+				       0, "falcon_gtc", priv);
+		if (ret)
+			dev_warn(dev, "unable to request GTC IRQ %d (%d), continuing in polling mode\n",
+				 priv->gtc_irq, ret);
+		else
+			dev_info(dev, "GTC IRQ %d registered successfully\n", priv->gtc_irq);
+	} else {
+		dev_warn(dev, "no GTC IRQ configured, continuing in polling mode\n");
 	}
 
 	/* 1. Calibrate BOSA Laser and APD */
@@ -263,6 +265,7 @@ static int falcon_gpon_probe(struct platform_device *pdev)
 	/* 6. Configure net_device */
 	ether_setup(netdev);
 	netdev->netdev_ops = &falcon_netdev_ops;
+	strcpy(netdev->name, "eth0");
 	eth_hw_addr_random(netdev);
 	netif_napi_add(netdev, &priv->napi, falcon_napi_poll);
 

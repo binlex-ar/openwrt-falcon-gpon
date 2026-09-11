@@ -69,6 +69,8 @@
 
 	gpon {
 		compatible = "lantiq,falcon-gpon";
+		interrupt-parent = <&icu0>;
+		interrupts = <40>;
 	};
 };
 
