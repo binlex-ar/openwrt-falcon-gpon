@@ -130,5 +130,3 @@ void falcon_bosa_shutdown(void __iomem *pma, void __iomem *dcdc_apd)
 }
 EXPORT_SYMBOL_GPL(falcon_bosa_shutdown);
 
-MODULE_LICENSE("GPL");
-MODULE_DESCRIPTION("Open-source BOSA Optical Transceiver Driver for Lantiq Falcon");

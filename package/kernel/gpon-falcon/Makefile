@@ -19,6 +19,7 @@ define KernelPackage/gpon-falcon
   DEPENDS:=@TARGET_lantiq_falcon
   FILES:=$(PKG_BUILD_DIR)/gpon_falcon.ko
   AUTOLOAD:=$(call AutoLoad,50,gpon_falcon)
+  KCONFIG:=
 endef
 
 define KernelPackage/gpon-falcon/description
@@ -27,20 +28,8 @@ define KernelPackage/gpon-falcon/description
   and ITU-T G.984.3 PLOAM state machine.
 endef
 
-define Build/Prepare
-	mkdir -p $(PKG_BUILD_DIR)
-	$(CP) ./src/* $(PKG_BUILD_DIR)/
-endef
-
-MAKE_OPTS:= \
-	ARCH="$(LINUX_KARCH)" \
-	CROSS_COMPILE="$(TARGET_CROSS)" \
-	M="$(PKG_BUILD_DIR)"
-
 define Build/Compile
-	$(MAKE) -C "$(LINUX_DIR)" \
-		$(MAKE_OPTS) \
-		modules
+	$(KERNEL_MAKE) M="$(PKG_BUILD_DIR)" modules
 endef
 
 define KernelPackage/gpon-falcon/install

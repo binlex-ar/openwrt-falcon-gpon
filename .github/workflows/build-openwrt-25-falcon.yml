@@ -50,7 +50,7 @@ jobs:
       - name: Compile OpenWrt Toolchain, Kernel and Images
         run: |
           cd openwrt
-          make -j$(nproc) || make -j1 V=s
+          make -j$(nproc) || (make package/kernel/gpon-falcon/compile V=sc && make -j$(nproc))
 
       - name: Archive firmware artifacts
         uses: actions/upload-artifact@v4

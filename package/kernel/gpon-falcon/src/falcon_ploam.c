@@ -396,5 +396,3 @@ void falcon_ploam_destroy(struct falcon_ploam_ctx *ctx)
 	ploam_state_transition(ctx, PLOAM_STATE_O1_INITIAL_RUN);
 }
 
-MODULE_DESCRIPTION("Lantiq Falcon ITU-T G.984.3 PLOAM State Machine");
-MODULE_LICENSE("GPL");

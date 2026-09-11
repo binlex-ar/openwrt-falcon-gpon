@@ -152,6 +152,3 @@ int falcon_net_pdu_write(void __iomem *sram_base, void __iomem *fsqm_base,
 }
 EXPORT_SYMBOL_GPL(falcon_net_pdu_write);
 
-MODULE_LICENSE("GPL");
-MODULE_AUTHOR("Clean-room Reverse Engineering Project");
-MODULE_DESCRIPTION("Open-source DMA and Packet Engine Driver for Lantiq Falcon");
