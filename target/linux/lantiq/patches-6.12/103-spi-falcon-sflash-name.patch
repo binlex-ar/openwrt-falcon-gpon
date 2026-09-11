@@ -8,7 +8,7 @@
  #include <linux/delay.h>
  #include <linux/of.h>
  #include <linux/of_platform.h>
-@@ -388,6 +389,15 @@
+@@ -388,6 +389,122 @@
  	return 0;
  }
  
@@ -17,14 +17,121 @@
 +	return "sflash";
 +}
 +
++static int falcon_sflash_exec_op(struct spi_mem *mem,
++				 const struct spi_mem_op *op)
++{
++	struct falcon_sflash *priv = spi_controller_get_devdata(mem->spi->controller);
++	struct device *dev = &mem->spi->dev;
++	unsigned long flags;
++	u32 val;
++	int ret = 0;
++
++	spin_lock_irqsave(&ebu_lock, flags);
++
++	priv->sfcmd = ((spi_get_chipselect(mem->spi, 0) << SFCMD_CS_OFFSET) & SFCMD_CS_MASK);
++	priv->sfcmd |= op->cmd.opcode & SFCMD_OPC_MASK;
++
++	if (op->addr.nbytes > 0) {
++		priv->sfcmd |= (op->addr.nbytes << SFCMD_ALEN_OFFSET);
++		ltq_ebu_w32((u32)op->addr.val, SFADDR);
++	}
++
++	if (op->dummy.nbytes > 0)
++		priv->sfcmd |= (op->dummy.nbytes << SFCMD_DUMLEN_OFFSET);
++
++	if (op->data.nbytes == 0) {
++		ltq_ebu_w32(priv->sfcmd, SFCMD);
++		do {
++			val = ltq_ebu_r32(SFSTAT);
++			if (val & SFSTAT_CMD_ERR) {
++				dev_err(dev, "SFSTAT: CMD_ERR (%x)\n", val);
++				ltq_ebu_w32(SFSTAT_CMD_ERR, SFSTAT);
++				ret = -EBADE;
++				break;
++			}
++		} while (val & SFSTAT_CMD_PEND);
++	} else if (op->data.dir == SPI_MEM_DATA_OUT) {
++		const u8 *txp = op->data.buf.out;
++		unsigned int bytelen = op->data.nbytes;
++		unsigned int len = 0;
++		val = 0;
++
++		priv->sfcmd |= SFCMD_DIR_WRITE | SFCMD_KEEP_CS_KEEP_SELECTED;
++
++		do {
++			if (bytelen--)
++				val |= (*txp++) << (8 * len++);
++			if (bytelen == 0)
++				priv->sfcmd &= ~SFCMD_KEEP_CS_KEEP_SELECTED;
++
++			if ((len == 4) || (bytelen == 0)) {
++				ltq_ebu_w32(val, SFDATA);
++				ltq_ebu_w32(priv->sfcmd | (len << SFCMD_DLEN_OFFSET), SFCMD);
++				len = 0;
++				val = 0;
++				priv->sfcmd &= ~(SFCMD_ALEN_MASK | SFCMD_DUMLEN_MASK);
++				do {
++					val = ltq_ebu_r32(SFSTAT);
++					if (val & SFSTAT_CMD_ERR) {
++						dev_err(dev, "SFSTAT: CMD_ERR (%x)\n", val);
++						ltq_ebu_w32(SFSTAT_CMD_ERR, SFSTAT);
++						ret = -EBADE;
++						break;
++					}
++				} while (val & SFSTAT_CMD_PEND);
++				if (ret)
++					break;
++			}
++		} while (bytelen);
++	} else if (op->data.dir == SPI_MEM_DATA_IN) {
++		u8 *rxp = op->data.buf.in;
++		unsigned int bytelen = op->data.nbytes;
++
++		priv->sfcmd &= ~SFCMD_DIR_WRITE;
++		priv->sfcmd |= SFCMD_KEEP_CS_KEEP_SELECTED;
++
++		do {
++			unsigned int len = (bytelen > 4) ? 4 : bytelen;
++			bytelen -= len;
++			if (bytelen == 0)
++				priv->sfcmd &= ~SFCMD_KEEP_CS_KEEP_SELECTED;
++
++			ltq_ebu_w32(priv->sfcmd | (len << SFCMD_DLEN_OFFSET), SFCMD);
++			priv->sfcmd &= ~(SFCMD_ALEN_MASK | SFCMD_DUMLEN_MASK);
++			do {
++				val = ltq_ebu_r32(SFSTAT);
++				if (val & SFSTAT_CMD_ERR) {
++					dev_err(dev, "SFSTAT: CMD_ERR (%x)\n", val);
++					ltq_ebu_w32(SFSTAT_CMD_ERR, SFSTAT);
++					ret = -EBADE;
++					break;
++				}
++			} while (val & SFSTAT_CMD_PEND);
++			if (ret)
++				break;
++
++			val = ltq_ebu_r32(SFDATA);
++			do {
++				*rxp++ = (val & 0xFF);
++				val >>= 8;
++				len--;
++			} while (len);
++		} while (bytelen);
++	}
++
++	spin_unlock_irqrestore(&ebu_lock, flags);
++	return ret;
++}
++
 +static const struct spi_controller_mem_ops falcon_sflash_mem_ops = {
 +	.get_name = falcon_sflash_get_name,
++	.exec_op = falcon_sflash_exec_op,
 +};
 +
  static int falcon_sflash_probe(struct platform_device *pdev)
  {
  	struct falcon_sflash *priv;
-@@ -406,11 +416,19 @@
+@@ -406,11 +523,19 @@
  	host->setup = falcon_sflash_setup;
  	host->transfer_one_message = falcon_sflash_xfer_one;
  	host->dev.of_node = pdev->dev.of_node;
