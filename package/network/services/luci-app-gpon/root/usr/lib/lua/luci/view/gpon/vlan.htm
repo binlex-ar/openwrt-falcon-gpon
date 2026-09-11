@@ -1,0 +1,30 @@
+<%+header%>
+
+<h2 name="content"><%:GPON VLAN & Traffic Overview%></h2>
+<div class="cbi-map-descr"><%:Active data path configuration, Linux bridge status, and OMCI GEM Port / VLAN associations.%></div>
+
+<fieldset class="cbi-section">
+	<legend><%:Network Bridge Status (eth0 <---> gpon0)%></legend>
+	<table class="table" style="width:100%">
+		<tr class="tr">
+			<td class="td" style="width:30%"><strong><%:Host Interface (SFP Cage)%></strong></td>
+			<td class="td"><code>eth0</code> (SGMII / 2.5G SerDes)</td>
+		</tr>
+		<tr class="tr">
+			<td class="td"><strong><%:GPON Interface (Optics)%></strong></td>
+			<td class="td"><code>gpon0</code> (GPE Packet Engine / GTC)</td>
+		</tr>
+		<tr class="tr">
+			<td class="td"><strong><%:Bridge Device%></strong></td>
+			<td class="td"><code>br-lan</code></td>
+		</tr>
+	</table>
+</fieldset>
+
+<fieldset class="cbi-section">
+	<legend><%:VLAN Mode Information%></legend>
+	<p><%:In standard VEIP mode, VLAN tagging and priority (802.1p) classification are dynamically negotiated with the ISP OLT via OMCI Managed Entity 171 (Extended VLAN Tagging Operation Configuration Data).%></p>
+	<p><%:All VLAN tags passed by your ISP router are transparently carried across the br-lan bridge to the optical line.%></p>
+</fieldset>
+
+<%+footer%>

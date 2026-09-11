@@ -28,11 +28,11 @@
 #define DRV_VERSION "1.0.0"
 
 static char *onu_sn = "ZYXE12345678";
-module_param(onu_sn, charp, 0444);
+module_param(onu_sn, charp, 0644);
 MODULE_PARM_DESC(onu_sn, "GPON ONU Serial Number (8 chars/bytes, e.g. ZYXE12345678)");
 
 static char *onu_pwd = "";
-module_param(onu_pwd, charp, 0444);
+module_param(onu_pwd, charp, 0644);
 MODULE_PARM_DESC(onu_pwd, "GPON Registration Password (up to 10 chars)");
 
 struct falcon_gpon_priv {

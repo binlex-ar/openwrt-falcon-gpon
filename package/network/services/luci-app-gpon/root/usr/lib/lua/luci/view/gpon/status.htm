@@ -1,0 +1,82 @@
+<%+header%>
+
+<h2 name="content"><%:GPON SFP Optical Status & Diagnostics%></h2>
+<div class="cbi-map-descr"><%:Real-time physical link status, ITU-T G.984.3 PLOAM state, and optical transceiver DDM telemetries.%></div>
+
+<fieldset class="cbi-section">
+	<legend><%:Optical Link Status%></legend>
+	<table class="table" style="width:100%">
+		<tr class="tr">
+			<td class="td" style="width:30%"><strong><%:Optical Link (Carrier)%></strong></td>
+			<td class="td" id="carrier_status"><em><%:Checking...%></em></td>
+		</tr>
+		<tr class="tr">
+			<td class="td"><strong><%:PLOAM State (ITU-T G.984.3)%></strong></td>
+			<td class="td" id="ploam_state"><em><%:Checking...%></em></td>
+		</tr>
+		<tr class="tr">
+			<td class="td"><strong><%:Active Serial Number%></strong></td>
+			<td class="td" id="gpon_sn"><em><%:Checking...%></em></td>
+		</tr>
+	</table>
+</fieldset>
+
+<fieldset class="cbi-section">
+	<legend><%:Optical Transceiver Telemetry (DDM)%></legend>
+	<table class="table" style="width:100%">
+		<tr class="tr">
+			<td class="td" style="width:30%"><strong><%:Rx Optical Power (1490nm)%></strong></td>
+			<td class="td" id="rx_power">-</td>
+		</tr>
+		<tr class="tr">
+			<td class="td"><strong><%:Tx Optical Power (1310nm)%></strong></td>
+			<td class="td" id="tx_power">-</td>
+		</tr>
+		<tr class="tr">
+			<td class="td"><strong><%:Laser Bias Current%></strong></td>
+			<td class="td" id="bias_current">-</td>
+		</tr>
+		<tr class="tr">
+			<td class="td"><strong><%:Internal Temperature%></strong></td>
+			<td class="td" id="temp">-</td>
+		</tr>
+		<tr class="tr">
+			<td class="td"><strong><%:Supply Voltage%></strong></td>
+			<td class="td" id="voltage">-</td>
+		</tr>
+	</table>
+</fieldset>
+
+<script type="text/javascript">
+function update_status() {
+	XHR.get('<%=luci.dispatcher.build_url("admin", "gpon", "status_data")%>', null, function(x, data) {
+		if (data) {
+			var cs = document.getElementById('carrier_status');
+			if (data.carrier === 'UP') {
+				cs.innerHTML = '<span style="color:green;font-weight:bold;"><%:LINK UP (Synchronized)%></span>';
+			} else {
+				cs.innerHTML = '<span style="color:red;font-weight:bold;"><%:LINK DOWN (No Signal / O1)%></span>';
+			}
+
+			var ps = document.getElementById('ploam_state');
+			if (data.ploam_state && data.ploam_state.indexOf('O5') !== -1) {
+				ps.innerHTML = '<span style="color:green;font-weight:bold;">' + data.ploam_state + '</span>';
+			} else {
+				ps.innerHTML = '<span style="color:orange;font-weight:bold;">' + (data.ploam_state || '-') + '</span>';
+			}
+
+			document.getElementById('gpon_sn').innerHTML = data.gpon_sn || '-';
+			document.getElementById('rx_power').innerHTML = data.rx_power || '-';
+			document.getElementById('tx_power').innerHTML = data.tx_power || '-';
+			document.getElementById('bias_current').innerHTML = data.bias_current || '-';
+			document.getElementById('temp').innerHTML = data.temp || '-';
+			document.getElementById('voltage').innerHTML = data.voltage || '-';
+		}
+	});
+}
+
+setInterval(update_status, 3000);
+update_status();
+</script>
+
+<%+footer%>

@@ -1,0 +1,9 @@
+#!/bin/sh
+# Initialize bridge eth0 <-> gpon0 if not configured
+
+if ! uci -q get network.@device[0] | grep -q "gpon0"; then
+	uci add_list network.@device[0].ports='gpon0' 2>/dev/null
+	uci commit network
+fi
+
+exit 0

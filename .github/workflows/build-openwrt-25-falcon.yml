@@ -33,7 +33,7 @@ jobs:
         run: |
           mkdir -p openwrt/package/kernel openwrt/package/network/services
           cp -r package/kernel/gpon-falcon openwrt/package/kernel/
-          cp -r package/network/services/omcid openwrt/package/network/services/
+          cp -r package/network/services/* openwrt/package/network/services/
           cd openwrt
           ./scripts/feeds update -a
           ./scripts/feeds install -a
@@ -62,5 +62,6 @@ jobs:
             openwrt/bin/targets/lantiq/falcon/*sysupgrade.bin
             openwrt/bin/targets/lantiq/falcon/*image*
             openwrt/bin/targets/lantiq/falcon/packages/*gpon*
+            openwrt/bin/packages/mips_24kc/*/*gpon*
             openwrt/bin/packages/mips_24kc/*/omcid*
 
