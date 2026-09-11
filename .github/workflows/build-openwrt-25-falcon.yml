@@ -34,6 +34,9 @@ jobs:
           mkdir -p openwrt/package/kernel openwrt/package/network/services
           cp -r package/kernel/gpon-falcon openwrt/package/kernel/
           cp -r package/network/services/* openwrt/package/network/services/
+          if [ -d target ]; then
+            cp -r target/* openwrt/target/
+          fi
           cd openwrt
           ./scripts/feeds update -a
           ./scripts/feeds install -a
